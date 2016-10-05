@@ -18,7 +18,7 @@ def is_prime(n):
 
 @app.route("/")
 def welcome():
-    return "Welcome to simple rest server<br>" \
+    return "Welcome to the simple rest server<br>" \
            "usage<br>" \
            "/prime/&lt;n&gt; - calculates the n-th prime number (<a target='_blank' href='/prime/55'>example</a>)<br>" \
            "/factor/&lt;n&gt; - factorizes n (<a target='_blank' href='/factor/55'>example</a>)<br>" \
