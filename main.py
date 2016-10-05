@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import Flask
+from flask import jsonify
 from time import sleep
 app = Flask(__name__)
 
@@ -7,8 +8,6 @@ app = Flask(__name__)
 def is_prime(n):
     """
     Проверка числа на его простоту
-    :param n:
-    :return:
     """
     for i in range(2, int(n ** 0.5) + 1):
         if n % i == 0:
@@ -26,61 +25,56 @@ def welcome():
            "(<a target='_blank' href='/ping/google.com/5'>example</a>)<br>"
 
 
-@app.route("/prime/<n>")
+@app.route("/prime/<int:n>")
 def prime(n):
     """
     Нахождение n-го простого числаа
-    :param n:
-    :return:
     """
     k = 1
     res = ""
     primes = 0
-    while primes < int(n) + 1:
+    while primes < n + 1:
         if is_prime(k):
             primes += 1
             res = str(k)
         k += 1
-    return res
+    return jsonify({'n': res})
 
 
-@app.route("/factor/<n>")
+@app.route("/factor/<int:n>")
 def factor(n):
     """
     Разложение на простые множители
-    :param n:
-    :return:
     """
-    a = int(n)
     res = []
     i = 2
-    while is_prime(a) == 0:
-        if is_prime(i) == 1 and a % i == 0:
-            a = int(a / i)
+    while not is_prime(n):
+        if is_prime(i) and n % i == 0:
+            n = int(n / i)
             res.append(i)
             i = 2
-        i += 1
-    res.append(a)
-    return ', '.join(str(i) for i in res)
+        else:
+            i += 1
+    res.append(n)
+
+    return jsonify(res)
 
 
-@app.route("/ping/<host>/<n>")
+@app.route("/ping/<host>/<int:n>")
 def ping(host, n):
     """
-    Пинг заданного сервера n - раз
-    :param host:
-    :param n:
-    :return:
+    Пинг заданного сервера n раз
     """
     import os
     import platform
     success = 0
-    for i in range(int(n)):
+    for i in range(n):
         ping_str = "-n 1" if platform.system().lower() == "windows" else "-c 1"
         if os.system("ping " + ping_str + " " + host) == 0:
             success += 1
         sleep(1)
-    return "{} ping succeeded {} out of {}".format(host, success, n)
+    res = {'hostname': host, 'packages': {'sent': n, 'received': success}}
+    return jsonify(res)
 
 
 if __name__ == "__main__":
